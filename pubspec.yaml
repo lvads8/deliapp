@@ -44,6 +44,7 @@ dependencies:
   screen_loader: ^4.0.1
   fluttertoast: ^8.0.8
   pull_to_refresh: ^2.0.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:

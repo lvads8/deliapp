@@ -3,54 +3,26 @@ import 'dart:io';
 
 import 'package:deliapp/api/common.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Utils {
-  static void alertUser(
+  static Future<T> showDialogAnimated<T>(
     BuildContext context,
-    String message, {
-    bool snackBar = true,
+    T def, {
+    required Widget content,
+    required List<Widget> actions,
+    bool dismissable = false,
   }) {
-    if (snackBar) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          content: SingleChildScrollView(
-            child: Text(message),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  static Future<bool> promptUser(BuildContext context, String message) async {
-    final res = await showGeneralDialog<bool>(
+    return showGeneralDialog<T>(
       context: context,
-      transitionDuration: const Duration(milliseconds: 400),
+      barrierLabel: 'animated-dialog',
+      barrierDismissible: dismissable,
       pageBuilder: (context, _, __) => AlertDialog(
         content: SingleChildScrollView(
-          child: Text(message),
+          child: content,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Nem'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Igen'),
-          ),
-        ],
+        actions: actions,
       ),
       transitionBuilder: (_, anim, __, child) {
         final animation = CurvedAnimation(
@@ -66,9 +38,49 @@ class Utils {
           child: child,
         );
       },
-    );
+    ).then((res) => res ?? def);
+  }
 
-    return res ?? false;
+  static void alertUser(
+    BuildContext context,
+    String message, {
+    bool snackBar = true,
+  }) {
+    if (snackBar) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    } else {
+      showDialogAnimated(
+        context,
+        null,
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    }
+  }
+
+  static Future<bool> promptUser(BuildContext context, String message) {
+    return showDialogAnimated(
+      context,
+      false,
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('NEM'),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('IGEN'),
+        ),
+      ],
+    );
   }
 
   static Future<String?> readString(String key) async {
@@ -121,5 +133,11 @@ class Utils {
     }
 
     return Future.value(fallback);
+  }
+
+  static String formatDate(DateTime date) {
+    final f = NumberFormat("00");
+
+    return '${f.format(date.month)}/${f.format(date.day)} ${f.format(date.hour)}:${f.format(date.minute)}';
   }
 }
