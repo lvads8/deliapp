@@ -56,13 +56,11 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
                     ),
                   ),
                   const Divider(),
-                  // ListTile(
-                  //   title: const Text('Rendelések'),
-                  //   leading: const Icon(Icons.directions_car),
-                  //   onTap: () async {
-                  //     await Navigator.of(context).popAndPushNamed('/main');
-                  //   },
-                  // ),
+                  ListTile(
+                    title: const Text('Rendelések'),
+                    leading: const Icon(Icons.directions_car),
+                    onTap: () => Navigator.pop(context),
+                  ),
                   ListTile(
                     title: const Text('Összegzés'),
                     leading: const Icon(Icons.attach_money),
@@ -102,22 +100,6 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
                 ],
               ),
             ),
-            // bottomNavigationBar: BlocBuilder<SelectedIndexCubit, int>(
-            //   builder: (context, state) => BottomNavigationBar(
-            //     items: const [
-            //       BottomNavigationBarItem(
-            //         icon: Icon(Icons.archive),
-            //         label: 'Pickup',
-            //       ),
-            //       BottomNavigationBarItem(
-            //         icon: Icon(Icons.unarchive),
-            //         label: 'Deliver',
-            //       ),
-            //     ],
-            //     currentIndex: state,
-            //     onTap: (v) => context.read<SelectedIndexCubit>().setIndex(v),
-            //   ),
-            // ),
           ),
         ),
       ),

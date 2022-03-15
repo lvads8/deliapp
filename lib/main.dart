@@ -19,15 +19,20 @@ class LoggerObserver extends BlocObserver {
 
 void main() async {
   GoogleFonts.config.allowRuntimeFetching = false;
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final auth = await AuthCubit.getInstance();
 
   BlocOverrides.runZoned(
-    () => runApp(const DeliApp()),
+    () => runApp(DeliApp(auth)),
     blocObserver: LoggerObserver(),
   );
 }
 
 class DeliApp extends StatelessWidget {
-  const DeliApp({Key? key}) : super(key: key);
+  final AuthCubit auth;
+
+  const DeliApp(this.auth, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,31 +42,42 @@ class DeliApp extends StatelessWidget {
     ]);
 
     return BlocProvider(
-      create: (_) => AuthCubit(),
-      child: MaterialApp(
-        theme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.red,
-            brightness: Brightness.light,
-          ),
-          textTheme: GoogleFonts.robotoTextTheme(ThemeData.light().textTheme),
+      create: (_) => auth,
+      lazy: false,
+      child: const DeliAppView(),
+    );
+  }
+}
+
+class DeliAppView extends StatelessWidget {
+  const DeliAppView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.red,
+          brightness: Brightness.light,
         ),
-        darkTheme: ThemeData.from(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.green,
-            brightness: Brightness.dark,
-          ),
-          textTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
-        ),
-        themeMode: ThemeMode.system,
-        title: 'DeliApp',
-        initialRoute: '/login',
-        routes: {
-          '/login': (_) => const LoginScreen(),
-          '/main': (_) => const MainScreen(),
-          '/summary': (_) => const SummaryScreen(),
-        },
+        textTheme: GoogleFonts.robotoTextTheme(ThemeData.light().textTheme),
       ),
+      darkTheme: ThemeData.from(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.dark,
+        ),
+        textTheme: GoogleFonts.robotoTextTheme(ThemeData.dark().textTheme),
+      ),
+      themeMode: ThemeMode.system,
+      title: 'DeliApp',
+      initialRoute:
+          context.read<AuthCubit>().isAuthenticated ? '/main' : 'login',
+      routes: {
+        '/login': (_) => const LoginScreen(),
+        '/main': (_) => const MainScreen(),
+        '/summary': (_) => const SummaryScreen(),
+      },
     );
   }
 }

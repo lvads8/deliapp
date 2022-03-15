@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:deliapp/api/common.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,10 +11,16 @@ class AuthCubitData {
   final bool isOnBreak;
 
   AuthCubitData(this.auth, this.name, this.username, this.isOnBreak);
+
+  @override
+  String toString() {
+    return "AuthCubitData(auth: $auth, name: $name, username: $username, isOnBreak: $isOnBreak)";
+  }
 }
 
 class AuthCubit extends Cubit<AuthCubitData?> {
   AuthCubit() : super(null) {
+    log('AuthCubit created');
     _readFromPrefs().ignore();
   }
 
@@ -58,5 +66,12 @@ class AuthCubit extends Cubit<AuthCubitData?> {
         prefs.getBool("isOnBreak")!,
       ));
     }
+  }
+
+  static Future<AuthCubit> getInstance() async {
+    final instance = AuthCubit();
+    await instance._readFromPrefs();
+
+    return instance;
   }
 }
