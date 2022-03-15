@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/constants.dart';
-import 'package:http/src/response.dart';
+import 'package:http/http.dart';
 
 class HistoryRequest {
   final Authentication auth;
