@@ -9,3 +9,5 @@ const String breakUrl =
     baseUrl + "DeliveryMediumApp/deliverymedium/fmlm/mobile/mark/break";
 const String getStartedTripsUlr =
     baseUrl + "TripApp/trip/lmfm/getStartedTripsByUserId";
+const String getHistoryUrl = baseUrl +
+    "DeliveryMediumApp/deliverymedium/fmlm/mobile/dmhistory?pageSize=100";
