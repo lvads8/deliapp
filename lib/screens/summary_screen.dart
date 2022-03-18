@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/history.dart';
 import 'package:deliapp/cubits/auth_cubit.dart';
+import 'package:deliapp/cubits/history_cubit.dart';
 import 'package:deliapp/cubits/timespan_cubit.dart';
 import 'package:deliapp/utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,20 +18,16 @@ class SummaryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<TimespanCubit>(
       create: (_) => TimespanCubit(),
-      child: const SummaryScreenView(),
+      child: BlocProvider<HistoryCubit>(
+        create: (_) => HistoryCubit(),
+        child: const SummaryScreenView(),
+      ),
     );
   }
 }
 
-class SummaryScreenView extends StatefulWidget {
+class SummaryScreenView extends StatelessWidget {
   const SummaryScreenView({Key? key}) : super(key: key);
-
-  @override
-  State<SummaryScreenView> createState() => _SummaryScreenViewState();
-}
-
-class _SummaryScreenViewState extends State<SummaryScreenView> {
-  Future<HistoryResponse>? _history;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +45,9 @@ class _SummaryScreenViewState extends State<SummaryScreenView> {
         onRefresh: () => _refresh(context),
         triggerMode: RefreshIndicatorTriggerMode.anywhere,
         child: Scrollbar(
-          // TODO: Remove FutureBuilder from this, as it causes stuff to disappear which isn't very nice lol
-          child: FutureBuilder(
-            future: _history,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.none) {
+          child: BlocBuilder<HistoryCubit, HistoryResponse?>(
+            builder: (context, state) {
+              if (state == null) {
                 return ListView(
                   children: [
                     Container(
@@ -68,16 +63,8 @@ class _SummaryScreenViewState extends State<SummaryScreenView> {
                   ],
                 );
               }
-              if (snapshot.connectionState != ConnectionState.done) {
-                return ListView(
-                  children: [
-                    Container(),
-                  ],
-                );
-              }
 
-              final data = snapshot.data as HistoryResponse;
-              if (data.trips.isEmpty) {
+              if (state.trips.isEmpty) {
                 return ListView(
                   children: [
                     Container(
@@ -94,53 +81,58 @@ class _SummaryScreenViewState extends State<SummaryScreenView> {
                 );
               }
 
-              return ListView.separated(
-                shrinkWrap: true,
-                itemCount: data.trips.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Card(
-                      margin: const EdgeInsets.fromLTRB(4, 4, 4, 8),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.max,
-                          children: [
-                            const Icon(
-                              Icons.paid,
-                              size: 56,
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'Kézpénz',
-                                  style: TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Text('${data.cashCollected} Ft')
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  final current = data.trips[index - 1];
-                  return _buildCard(current);
-                },
-                separatorBuilder: (_, __) => Container(
-                  height: 2,
-                ),
-              );
+              return _buildHistoryView(state);
             },
           ),
         ),
+      ),
+    );
+  }
+
+  ListView _buildHistoryView(HistoryResponse state) {
+    return ListView.separated(
+      shrinkWrap: true,
+      itemCount: state.trips.length + 1,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return Card(
+            margin: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const Icon(
+                    Icons.paid,
+                    size: 56,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    // TODO: Make this look nicer
+                    children: [
+                      const Text(
+                        'Kézpénz',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text('${state.cashCollected} Ft')
+                    ],
+                  )
+                ],
+              ),
+            ),
+          );
+        }
+
+        final current = state.trips[index - 1];
+        return _buildCard(current);
+      },
+      separatorBuilder: (_, __) => Container(
+        height: 2,
       ),
     );
   }
@@ -175,22 +167,16 @@ class _SummaryScreenViewState extends State<SummaryScreenView> {
     log('Refresh called!');
 
     final auth = context.read<AuthCubit>().state!.auth;
+    final history = context.read<HistoryCubit>();
     final timespanCubit = context.read<TimespanCubit>();
     final from = timespanCubit.state.from;
     final to = timespanCubit.state.to;
 
-    final future = Utils.tryRequest(
+    await Utils.tryRequest(
       context,
-      () => History.getHistory(HistoryRequest(auth, from, to)),
+      () => history.getHistory(auth, from, to),
       null,
-      snackbar: true,
-    ).then((value) => value ?? const HistoryResponse(0, []));
-
-    setState(() {
-      _history = future;
-    });
-
-    await future;
+    );
   }
 
   static Future<void> _showTimespanPickerDialog(
