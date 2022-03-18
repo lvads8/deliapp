@@ -30,6 +30,11 @@ class Break extends ResponseObjectFactory<bool> {
 
   @override
   bool fromResponse(Response res) {
-    return res.statusCode == 200;
+    final body = jsonDecode(utf8.decode(res.bodyBytes));
+    if (res.statusCode == 401 || body['status'] == 401) {
+      throw UnauthorizedException();
+    }
+
+    return res.statusCode == 200 && body['status'] == 200;
   }
 }

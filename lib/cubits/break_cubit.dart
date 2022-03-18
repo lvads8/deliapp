@@ -9,7 +9,7 @@ class BreakCubit extends Cubit<bool> {
     emit(value);
     try {
       if (!await Break.setBreak(BreakRequest(auth, value))) {
-        throw UnauthorizedException();
+        throw "Ismeretlen hiba történt break beállításakor";
       }
     } catch (e) {
       emit(!value);
