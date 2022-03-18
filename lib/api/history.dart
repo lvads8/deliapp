@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/constants.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 
 class HistoryRequest {
   final Authentication auth;
@@ -34,11 +35,43 @@ class History extends ResponseObjectFactory<HistoryResponse> {
   static Future<HistoryResponse> getHistory(HistoryRequest request) {
     final uri = Uri.parse(getHistoryUrl +
         '&startDt=' +
-        request.from.toString() +
+        _formatDate(request.from) +
         '&endDt=' +
-        request.to.toString());
+        _formatDate(request.to));
 
     return ApiRequest.getJson(uri, _instance, auth: request.auth);
+  }
+
+  static String _formatDate(DateTime date) {
+    final f = NumberFormat('00');
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    final buf = StringBuffer();
+
+    buf.write(date.day);
+    buf.write(' ');
+    buf.write(months[date.month - 1]);
+    buf.write(', ');
+    buf.write(date.year);
+    buf.write(' ');
+    buf.write(f.format(date.hour));
+    buf.write(':');
+    buf.write(f.format(date.minute));
+    buf.write(':59');
+
+    return buf.toString();
   }
 
   @override
@@ -48,21 +81,21 @@ class History extends ResponseObjectFactory<HistoryResponse> {
     final body = jsonDecode(utf8.decode(res.bodyBytes));
     if (res.statusCode != 200 || body["status"] != 200) throw body["message"];
 
+    if (!body.containsKey("data")) return const HistoryResponse(0, []);
+
     final data = body["data"][0];
-    final cash = (data["totalAmountCollected"] as double) as int;
+    final cash = (data["totalAmountCollected"] as double).floor();
     final trips = (data["deliveryMediumTripHistoryDTOs"] as List<dynamic>)
         .map(
           (e) => HistoryTrip(
-            // start,
-            // end,
-            // orderCount,
-            // name,
-            DateTime.now(),
-            DateTime.now(),
-            0,
-            "",
+            DateTime.fromMillisecondsSinceEpoch(e["tripStartDt"]),
+            DateTime.fromMillisecondsSinceEpoch(e["tripEndDt"]),
+            e["orderCount"],
+            e["tripName"],
           ),
         )
+        .toList(growable: false)
+        .reversed
         .toList(growable: false);
 
     return HistoryResponse(cash, trips);
