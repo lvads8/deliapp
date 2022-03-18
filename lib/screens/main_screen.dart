@@ -117,19 +117,6 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
       () => context.read<BreakCubit>().setBreak(auth, value),
       null,
       snackbar: false,
-      errorCallback: (e) async {
-        if (e is UnauthorizedException) {
-          final nav = Navigator.of(context);
-          await Fluttertoast.showToast(
-            msg: 'Megszakadt a kapcsolat, kérlek jelentkezz be újra',
-            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            textColor: Theme.of(context).colorScheme.inversePrimary,
-          );
-
-          nav.pop();
-          await nav.pushReplacementNamed('/login');
-        }
-      },
     );
   }
 }

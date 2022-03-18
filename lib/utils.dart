@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
 import 'package:deliapp/api/common.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -106,7 +108,6 @@ class Utils {
     Future<T> Function() call,
     T fallback, {
     bool snackbar = true,
-    void Function(Object)? errorCallback,
   }) async {
     try {
       return await call();
@@ -123,11 +124,17 @@ class Utils {
         snackBar: snackbar,
       );
 
-      errorCallback?.call(UnauthorizedException());
+      final nav = Navigator.of(context);
+      await Fluttertoast.showToast(
+        msg: 'Megszakadt a kapcsolat, kérlek jelentkezz be újra',
+        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+        textColor: Theme.of(context).colorScheme.inversePrimary,
+      );
+
+      nav.popUntil((route) => !route.isFirst);
+      nav.pushReplacementNamed('/login');
     } catch (e) {
       log("Unknown error ocurred during login", error: e);
-
-      errorCallback?.call(e);
 
       alertUser(context, "Ismeretlen hiba történt", snackBar: snackbar);
     }
