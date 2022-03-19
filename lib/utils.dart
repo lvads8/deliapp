@@ -118,12 +118,6 @@ class Utils {
         snackBar: snackbar,
       );
     } on UnauthorizedException {
-      alertUser(
-        context,
-        "A belépés már nem érvényes, próbálj meg bejelentkezni újra",
-        snackBar: snackbar,
-      );
-
       final nav = Navigator.of(context);
       await Fluttertoast.showToast(
         msg: 'Megszakadt a kapcsolat, kérlek jelentkezz be újra',
