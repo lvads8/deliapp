@@ -14,7 +14,7 @@ class AuthCubitData {
 
   @override
   String toString() {
-    return "AuthCubitData(auth: $auth, name: $name, username: $username, isOnBreak: $isOnBreak)";
+    return 'AuthCubitData(auth: $auth, name: $name, username: $username, isOnBreak: $isOnBreak)';
   }
 }
 
@@ -39,31 +39,31 @@ class AuthCubit extends Cubit<AuthCubitData?> {
   Future<void> _writeToPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     if (state != null) {
-      prefs.setString("www", state!.auth.auth);
-      prefs.setString("secret", state!.auth.secret);
-      prefs.setString("name", state!.name);
-      prefs.setString("username", state!.username);
-      prefs.setBool("isOnBreak", state!.isOnBreak);
+      prefs.setString('www', state!.auth.auth);
+      prefs.setString('secret', state!.auth.secret);
+      prefs.setString('name', state!.name);
+      prefs.setString('username', state!.username);
+      prefs.setBool('isOnBreak', state!.isOnBreak);
     } else {
-      prefs.remove("www");
-      prefs.remove("secret");
-      prefs.remove("name");
-      prefs.remove("username");
-      prefs.remove("isOnBreak");
+      prefs.remove('www');
+      prefs.remove('secret');
+      prefs.remove('name');
+      prefs.remove('username');
+      prefs.remove('isOnBreak');
     }
   }
 
   Future<void> _readFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("www")) {
+    if (prefs.containsKey('www')) {
       emit(AuthCubitData(
         Authentication(
-          prefs.getString("www")!,
-          prefs.getString("secret")!,
+          prefs.getString('www')!,
+          prefs.getString('secret')!,
         ),
-        prefs.getString("name")!,
-        prefs.getString("username")!,
-        prefs.getBool("isOnBreak")!,
+        prefs.getString('name')!,
+        prefs.getString('username')!,
+        prefs.getBool('isOnBreak')!,
       ));
     }
   }

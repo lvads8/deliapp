@@ -1,18 +1,26 @@
 import 'dart:developer';
 
-import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/history.dart';
 import 'package:deliapp/cubits/auth_cubit.dart';
 import 'package:deliapp/cubits/history_cubit.dart';
 import 'package:deliapp/cubits/timespan_cubit.dart';
+import 'package:deliapp/screens/main_screen.dart';
 import 'package:deliapp/utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
-class SummaryScreen extends StatelessWidget {
+class SummaryScreen extends StatelessWidget with MainScreenComponent {
   const SummaryScreen({Key? key}) : super(key: key);
+
+  @override
+  String get title => 'Összegzés';
+
+  @override
+  Icon get icon => const Icon(Icons.attach_money);
+
+  @override
+  List<Widget> get actions;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +103,7 @@ class SummaryScreenView extends StatelessWidget {
       itemCount: state.trips.length + 1,
       itemBuilder: (context, index) {
         if (index == 0) {
+          // TODO: Make this look nicer
           return Card(
             margin: const EdgeInsets.fromLTRB(4, 4, 4, 8),
             child: Padding(
@@ -110,7 +119,6 @@ class SummaryScreenView extends StatelessWidget {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,
-                    // TODO: Make this look nicer
                     children: [
                       const Text(
                         'Kézpénz',

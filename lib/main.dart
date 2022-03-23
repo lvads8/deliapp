@@ -13,7 +13,7 @@ class LoggerObserver extends BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
     super.onChange(bloc, change);
-    log("${bloc.runtimeType} $change");
+    log('${bloc.runtimeType} $change');
   }
 }
 
@@ -54,6 +54,9 @@ class DeliAppView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final route =
+        context.read<AuthCubit>().isAuthenticated ? '/main' : '/login';
+
     return MaterialApp(
       theme: ThemeData.from(
         colorScheme: ColorScheme.fromSeed(
@@ -71,8 +74,7 @@ class DeliAppView extends StatelessWidget {
       ),
       themeMode: ThemeMode.system,
       title: 'DeliApp',
-      initialRoute:
-          context.read<AuthCubit>().isAuthenticated ? '/main' : 'login',
+      initialRoute: route,
       routes: {
         '/login': (_) => const LoginScreen(),
         '/main': (_) => const MainScreen(),

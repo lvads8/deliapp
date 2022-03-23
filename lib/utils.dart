@@ -114,7 +114,7 @@ class Utils {
     } on SocketException {
       alertUser(
         context,
-        "A LogiNext nem érhető el, ellenőrizd az internetkapcsolatod",
+        'A LogiNext nem érhető el, ellenőrizd az internetkapcsolatod',
         snackBar: snackbar,
       );
     } on UnauthorizedException {
@@ -128,16 +128,16 @@ class Utils {
       nav.popUntil((route) => !route.isFirst);
       nav.pushReplacementNamed('/login');
     } catch (e) {
-      log("Unknown error ocurred during login", error: e);
+      log('Unknown error ocurred during login', error: e);
 
-      alertUser(context, "Ismeretlen hiba történt", snackBar: snackbar);
+      alertUser(context, 'Ismeretlen hiba történt', snackBar: snackbar);
     }
 
     return Future.value(fallback);
   }
 
   static String formatDate(DateTime date) {
-    final f = NumberFormat("00");
+    final f = NumberFormat('00');
 
     return '${f.format(date.month)}/${f.format(date.day)} ${f.format(date.hour)}:${f.format(date.minute)}';
   }

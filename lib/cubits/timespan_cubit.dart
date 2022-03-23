@@ -8,7 +8,7 @@ class TimespanCubitData {
 
   @override
   String toString() {
-    return "TimespanCubitData(from: $from, to: $to)";
+    return 'TimespanCubitData(from: $from, to: $to)';
   }
 }
 

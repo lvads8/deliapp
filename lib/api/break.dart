@@ -17,7 +17,7 @@ class Break extends ResponseObjectFactory<bool> {
 
   static Future<bool> setBreak(BreakRequest request) {
     final body = jsonEncode({
-      "isOnBreakFl": request.value,
+      'isOnBreakFl': request.value,
     });
 
     return ApiRequest.putJson(

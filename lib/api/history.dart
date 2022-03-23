@@ -79,19 +79,19 @@ class History extends ResponseObjectFactory<HistoryResponse> {
     if (res.statusCode == 401) throw UnauthorizedException();
 
     final body = jsonDecode(utf8.decode(res.bodyBytes));
-    if (res.statusCode != 200 || body["status"] != 200) throw body["message"];
+    if (res.statusCode != 200 || body['status'] != 200) throw body['message'];
 
-    if (!body.containsKey("data")) return const HistoryResponse(0, []);
+    if (!body.containsKey('data')) return const HistoryResponse(0, []);
 
-    final data = body["data"][0];
-    final cash = (data["totalAmountCollected"] as double).floor();
-    final trips = (data["deliveryMediumTripHistoryDTOs"] as List<dynamic>)
+    final data = body['data'][0];
+    final cash = (data['totalAmountCollected'] as double).floor();
+    final trips = (data['deliveryMediumTripHistoryDTOs'] as List<dynamic>)
         .map(
           (e) => HistoryTrip(
-            DateTime.fromMillisecondsSinceEpoch(e["tripStartDt"]),
-            DateTime.fromMillisecondsSinceEpoch(e["tripEndDt"]),
-            e["orderCount"],
-            e["tripName"],
+            DateTime.fromMillisecondsSinceEpoch(e['tripStartDt']),
+            DateTime.fromMillisecondsSinceEpoch(e['tripEndDt']),
+            e['orderCount'],
+            e['tripName'],
           ),
         )
         .toList(growable: false)

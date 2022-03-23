@@ -2,12 +2,16 @@ import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/logout.dart';
 import 'package:deliapp/cubits/auth_cubit.dart';
 import 'package:deliapp/cubits/break_cubit.dart';
-// import 'package:deliapp/cubits/selected_index_cubit.dart';
 import 'package:deliapp/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:screen_loader/screen_loader.dart';
+
+mixin MainScreenComponent {
+  String get title;
+  Icon get icon;
+  List<Widget> get actions;
+}
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -43,7 +47,7 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
                   ),
                   BlocBuilder<BreakCubit, bool>(
                     builder: (context, state) => ListTile(
-                      title: const Text("Szünet"),
+                      title: const Text('Szünet'),
                       leading: const Icon(Icons.coffee),
                       trailing: Switch(
                         activeColor: Theme.of(context).colorScheme.primary,
@@ -70,7 +74,7 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
                   ),
                   const Divider(),
                   ListTile(
-                    title: const Text("Kijelentkezés"),
+                    title: const Text('Kijelentkezés'),
                     leading: const Icon(Icons.logout),
                     onTap: () async {
                       if (!await Utils.promptUser(
@@ -96,7 +100,7 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Lűűőőogged in as ${authState.name}!"),
+                  Text('Lűűőőogged in as ${authState.name}!'),
                 ],
               ),
             ),

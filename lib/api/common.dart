@@ -14,7 +14,7 @@ class Authentication {
 
   @override
   String toString() {
-    return "Authentication(auth: $auth, secret: $secret)";
+    return 'Authentication(auth: $auth, secret: $secret)';
   }
 }
 
@@ -32,20 +32,20 @@ abstract class ApiRequest {
     final response = await get(url,
         headers: auth != null
             ? {
-                "Host": "products.loginextsolutions.com",
-                "Content-Type": "application/json; charset=utf-8",
-                "User-Agent": "LogiNextApps",
-                "x-app-version": "5.0.99",
-                "x-platform": "Hmmm",
-                "www-authenticate": auth.auth,
-                "client_secret_key": auth.secret
+                'Host': 'products.loginextsolutions.com',
+                'Content-Type': 'application/json; charset=utf-8',
+                'User-Agent': 'LogiNextApps',
+                'x-app-version': '5.0.99',
+                'x-platform': 'Hmmm',
+                'www-authenticate': auth.auth,
+                'client_secret_key': auth.secret
               }
             : {
-                "Host": "products.loginextsolutions.com",
-                "Content-Type": "application/json; charset=utf-8",
-                "User-Agent": "LogiNextApps",
-                "x-app-version": "5.0.99",
-                "x-platform": "Hmmm"
+                'Host': 'products.loginextsolutions.com',
+                'Content-Type': 'application/json; charset=utf-8',
+                'User-Agent': 'LogiNextApps',
+                'x-app-version': '5.0.99',
+                'x-platform': 'Hmmm'
               });
 
     log('GET($url) => ${serializeResponse(response)}');
@@ -61,24 +61,24 @@ abstract class ApiRequest {
     final response = await post(url,
         headers: auth != null
             ? {
-                "Host": "products.loginextsolutions.com",
-                "Content-Type": "application/json; charset=utf-8",
-                "User-Agent": userAgent,
-                "x-app-version": version,
-                "x-platform": platform,
-                "www-authenticate": auth.auth,
-                "client_secret_key": auth.secret
+                'Host': 'products.loginextsolutions.com',
+                'Content-Type': 'application/json; charset=utf-8',
+                'User-Agent': userAgent,
+                'x-app-version': version,
+                'x-platform': platform,
+                'www-authenticate': auth.auth,
+                'client_secret_key': auth.secret
               }
             : {
-                "Host": "products.loginextsolutions.com",
-                "Content-Type": "application/json; charset=utf-8",
-                "User-Agent": userAgent,
-                "x-app-version": version,
-                "x-platform": platform,
+                'Host': 'products.loginextsolutions.com',
+                'Content-Type': 'application/json; charset=utf-8',
+                'User-Agent': userAgent,
+                'x-app-version': version,
+                'x-platform': platform,
               },
-        body: body ?? "{}");
+        body: body ?? '{}');
 
-    log('POST($url) with body ${body ?? "{}"} => ${serializeResponse(response)}');
+    log('POST($url) with body ${body ?? '{}'} => ${serializeResponse(response)}');
     return fac.fromResponse(response);
   }
 
@@ -92,33 +92,33 @@ abstract class ApiRequest {
       url,
       headers: auth != null
           ? {
-              "Host": "products.loginextsolutions.com",
-              "Content-Type": "application/json; charset=utf-8",
-              "User-Agent": userAgent,
-              "x-app-version": version,
-              "x-platform": platform,
-              "www-authenticate": auth.auth,
-              "client_secret_key": auth.secret
+              'Host': 'products.loginextsolutions.com',
+              'Content-Type': 'application/json; charset=utf-8',
+              'User-Agent': userAgent,
+              'x-app-version': version,
+              'x-platform': platform,
+              'www-authenticate': auth.auth,
+              'client_secret_key': auth.secret
             }
           : {
-              "Host": "products.loginextsolutions.com",
-              "Content-Type": "application/json; charset=utf-8",
-              "User-Agent": userAgent,
-              "x-app-version": version,
-              "x-platform": platform,
+              'Host': 'products.loginextsolutions.com',
+              'Content-Type': 'application/json; charset=utf-8',
+              'User-Agent': userAgent,
+              'x-app-version': version,
+              'x-platform': platform,
             },
-      body: body ?? "{}",
+      body: body ?? '{}',
     );
 
-    log('PUT($url) with body ${body ?? "{}"} => ${serializeResponse(response)}');
+    log('PUT($url) with body ${body ?? '{}'} => ${serializeResponse(response)}');
     return fac.fromResponse(response);
   }
 
   static String serializeResponse(Response response) {
     final obj = {
-      "code": response.statusCode,
-      "headers": response.headers,
-      "body": utf8.decode(response.bodyBytes),
+      'code': response.statusCode,
+      'headers': response.headers,
+      'body': utf8.decode(response.bodyBytes),
     };
 
     return jsonEncode(obj);

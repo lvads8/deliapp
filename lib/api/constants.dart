@@ -1,17 +1,17 @@
-const String userAgent = "KFCDeliApp";
-const String platform = "KFC";
-const String version = "5.0.99";
+const String userAgent = 'KFCDeliApp';
+const String platform = 'KFC';
+const String version = '5.0.99';
 
-const String baseUrl = "https://products.loginextsolutions.com/";
-const String loginUrl = baseUrl + "LoginApp/login/mobile/authenticate";
-const String logoutUrl = baseUrl + "LoginApp/login/mobile/logout";
+const String baseUrl = 'https://products.loginextsolutions.com/';
+const String loginUrl = baseUrl + 'LoginApp/login/mobile/authenticate';
+const String logoutUrl = baseUrl + 'LoginApp/login/mobile/logout';
 const String breakUrl =
-    baseUrl + "DeliveryMediumApp/deliverymedium/fmlm/mobile/mark/break";
+    baseUrl + 'DeliveryMediumApp/deliverymedium/fmlm/mobile/mark/break';
 const String getStartedTripsUlr =
-    baseUrl + "TripApp/trip/lmfm/getStartedTripsByUserId";
+    baseUrl + 'TripApp/trip/lmfm/getStartedTripsByUserId';
 const String getHistoryUrl = baseUrl +
-    "DeliveryMediumApp/deliverymedium/fmlm/mobile/dmhistory?pageSize=100";
-const String tripIdUrl = baseUrl + "TripApp/trip/lmfm/getStartedTripsByUserId";
+    'DeliveryMediumApp/deliverymedium/fmlm/mobile/dmhistory?pageSize=100';
+const String tripIdUrl = baseUrl + 'TripApp/trip/lmfm/getStartedTripsByUserId';
 const String checkinUrl =
     baseUrl + 'ShipmentApp/mobile/shipment/mile/checkin?path_param_url=1729';
 const String checkoutUrl =

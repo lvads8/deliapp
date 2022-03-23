@@ -15,8 +15,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static const String _usernameKey = "remember-username";
-  static const String _passwordKey = "remember-password";
+  static const String _usernameKey = 'remember-username';
+  static const String _passwordKey = 'remember-password';
 
   final GlobalKey<FormState> _formKey = GlobalKey();
   final TextEditingController _username = TextEditingController();
@@ -27,18 +27,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _LoginScreenState() {
     Utils.readString(_usernameKey)
-        .then((value) => _username.text = value ?? "");
+        .then((value) => _username.text = value ?? '');
     Utils.readString(_passwordKey)
-        .then((value) => _password.text = value ?? "");
+        .then((value) => _password.text = value ?? '');
   }
 
   Future<bool> login(String username, String password) {
     return Utils.tryRequest(context, () async {
-      log("Logging in with credentials: $username:$password");
+      log('Logging in with credentials: $username:$password');
 
       final request = LoginRequest(username, password);
       final result = await Login.login(request);
-      log("Login result: $result");
+      log('Login result: $result');
 
       if (result is Success) {
         context.read<AuthCubit>().login(
@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         return true;
       } else if (result is Failure) {
-        Utils.alertUser(context, "Helytelen felhasználónév vagy jelszó");
+        Utils.alertUser(context, 'Helytelen felhasználónév vagy jelszó');
       }
 
       setState(() {
@@ -135,16 +135,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   labelStyle: TextStyle(
                     fontSize: 14,
                   ),
-                  labelText: "Felhasználónév",
+                  labelText: 'Felhasználónév',
                 ),
-                restorationId: "login-username",
                 controller: _username,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 autocorrect: false,
                 textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return "Add meg a felhasználónevet";
+                    return 'Add meg a felhasználónevet';
                   }
 
                   return null;
@@ -158,16 +157,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 labelStyle: TextStyle(
                   fontSize: 14,
                 ),
-                labelText: "Jelszó",
+                labelText: 'Jelszó',
               ),
-              restorationId: "login-password",
               controller: _password,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               autocorrect: false,
               obscureText: true,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return "Add meg a jelszót";
+                  return 'Add meg a jelszót';
                 }
 
                 return null;
@@ -183,7 +181,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _rememberMe = val!;
                     }),
                   ),
-                  const Text("Emlékezz rám")
+                  const Text('Emlékezz rám')
                 ],
               ),
               onTap: () => setState(() {
@@ -203,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
         width: double.infinity,
         child: ElevatedButton(
           onPressed: _loginPressed,
-          child: const Text("Bejelentkezés"),
+          child: const Text('Bejelentkezés'),
         ),
       ),
     );

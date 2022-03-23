@@ -38,7 +38,7 @@ class Success extends LoginResponse {
 
   @override
   String toString() {
-    return "Success(auth: $auth)";
+    return 'Success(auth: $auth)';
   }
 }
 
@@ -49,7 +49,7 @@ class Failure extends LoginResponse {
 
   @override
   String toString() {
-    return "Failure(message: $message)";
+    return 'Failure(message: $message)';
   }
 }
 
@@ -70,9 +70,9 @@ class Login extends ResponseObjectFactory<LoginResponse> {
     LoginRequest request,
   ) async {
     final encodedRequest = {
-      "userName": request.username,
-      "password": await _hashPassword(request.username, request.password),
-      "imei": await _getUniqueId()
+      'userName': request.username,
+      'password': await _hashPassword(request.username, request.password),
+      'imei': await _getUniqueId()
     };
     return encodedRequest;
   }
@@ -80,7 +80,7 @@ class Login extends ResponseObjectFactory<LoginResponse> {
   static Future<String> _hashPassword(String username, String password) async {
     final mac = Hmac(Sha1());
     final pbkdf2 = Pbkdf2(macAlgorithm: mac, iterations: 128, bits: 512);
-    final hash = utf8.encode(username.toLowerCase() + password + "MOBILE");
+    final hash = utf8.encode(username.toLowerCase() + password + 'MOBILE');
     final passBytes = SecretKey(utf8.encode(password));
     final derived = await pbkdf2.deriveKey(secretKey: passBytes, nonce: hash);
     final bytes = await derived.extractBytes();
@@ -88,15 +88,15 @@ class Login extends ResponseObjectFactory<LoginResponse> {
     final encodedHash = _toHexString(hash);
     final encodedBytes = _toHexString(bytes);
 
-    return "128:$encodedHash:$encodedBytes";
+    return '128:$encodedHash:$encodedBytes';
   }
 
   static Future<String> _getUniqueId() async {
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey("uuid")) return prefs.getString("uuid")!;
+    if (prefs.containsKey('uuid')) return prefs.getString('uuid')!;
 
     final uuid = const Uuid().v4();
-    prefs.setString("uuid", uuid);
+    prefs.setString('uuid', uuid);
 
     return uuid;
   }
@@ -116,21 +116,21 @@ class Login extends ResponseObjectFactory<LoginResponse> {
   @override
   LoginResponse fromResponse(Response res) {
     final body = jsonDecode(utf8.decode(res.bodyBytes));
-    if (body["status"] == 200) {
-      final data = body["data"];
+    if (body['status'] == 200) {
+      final data = body['data'];
 
       return Success(
         Authentication(
           res.headers['www-authenticate']!,
           res.headers['client_secret_key']!,
         ),
-        data["deliveryMediumName"],
-        data["userName"],
-        data["isOnBreakFl"] == "Y",
+        data['deliveryMediumName'],
+        data['userName'],
+        data['isOnBreakFl'] == 'Y',
       );
     } else {
       return Failure(
-        res.statusCode == 200 ? body["message"] : body["error"],
+        res.statusCode == 200 ? body['message'] : body['error'],
       );
     }
   }
