@@ -111,6 +111,8 @@ class Utils {
   }) async {
     try {
       return await call();
+    } on StateError {
+      // Element is no longer visible, blah blah we don't care
     } on SocketException {
       alertUser(
         context,

@@ -20,7 +20,7 @@ class SummaryScreen extends StatelessWidget with MainScreenComponent {
   Icon get icon => const Icon(Icons.attach_money);
 
   @override
-  List<Widget> get actions;
+  List<Widget> get actions => [];
 
   @override
   Widget build(BuildContext context) {
