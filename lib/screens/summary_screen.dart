@@ -20,78 +20,57 @@ class SummaryScreen extends StatelessWidget with MainScreenComponent {
   Icon get icon => const Icon(Icons.attach_money);
 
   @override
-  List<Widget> get actions => [];
+  List<WidgetBuilder> get actions => [
+        (context) => IconButton(
+              onPressed: () => _showTimespanPickerDialog(context),
+              icon: const Icon(Icons.date_range),
+            ),
+      ];
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<TimespanCubit>(
-      create: (_) => TimespanCubit(),
-      child: BlocProvider<HistoryCubit>(
-        create: (_) => HistoryCubit(),
-        child: const SummaryScreenView(),
-      ),
-    );
-  }
-}
-
-class SummaryScreenView extends StatelessWidget {
-  const SummaryScreenView({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Összegzés'),
-        actions: [
-          IconButton(
-            onPressed: () => _showTimespanPickerDialog(context),
-            icon: const Icon(Icons.date_range),
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => _refresh(context),
-        triggerMode: RefreshIndicatorTriggerMode.anywhere,
-        child: Scrollbar(
-          child: BlocBuilder<HistoryCubit, HistoryResponse?>(
-            builder: (context, state) {
-              if (state == null) {
-                return ListView(
-                  children: [
-                    Container(
-                      height: 100,
+    return RefreshIndicator(
+      onRefresh: () => _refresh(context),
+      triggerMode: RefreshIndicatorTriggerMode.anywhere,
+      child: Scrollbar(
+        child: BlocBuilder<HistoryCubit, HistoryResponse?>(
+          builder: (context, state) {
+            if (state == null) {
+              return ListView(
+                children: [
+                  Container(
+                    height: 100,
+                  ),
+                  Text(
+                    'Válassz ki egy időszakot és húzd lefelé a frissítéshez',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
                     ),
-                    Text(
-                      'Válassz ki egy időszakot és húzd lefelé a frissítéshez',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                      ),
-                    ),
-                  ],
-                );
-              }
+                  ),
+                ],
+              );
+            }
 
-              if (state.trips.isEmpty) {
-                return ListView(
-                  children: [
-                    Container(
-                      height: 100,
+            if (state.trips.isEmpty) {
+              return ListView(
+                children: [
+                  Container(
+                    height: 100,
+                  ),
+                  Text(
+                    'Nincs rendelés az adott időszakban',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).hintColor,
                     ),
-                    Text(
-                      'Nincs rendelés az adott időszakban',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Theme.of(context).hintColor,
-                      ),
-                    ),
-                  ],
-                );
-              }
+                  ),
+                ],
+              );
+            }
 
-              return _buildHistoryView(state);
-            },
-          ),
+            return _buildHistoryView(state);
+          },
         ),
       ),
     );
