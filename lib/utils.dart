@@ -132,7 +132,7 @@ class Utils {
     } catch (e) {
       log('Unknown error ocurred during login', error: e);
 
-      alertUser(context, 'Ismeretlen hiba történt', snackBar: snackbar);
+      alertUser(context, 'Ismeretlen hiba történt: $e', snackBar: snackbar);
     }
 
     return Future.value(fallback);
