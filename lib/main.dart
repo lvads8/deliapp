@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:deliapp/cubits/auth_cubit.dart';
 import 'package:deliapp/screens/login_screen.dart';
 import 'package:deliapp/screens/main_screen.dart';
+import 'package:deliapp/screens/order_details_screen.dart';
 import 'package:deliapp/screens/summary_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -79,6 +80,7 @@ class DeliAppView extends StatelessWidget {
         '/login': (_) => const LoginScreen(),
         '/main': (_) => const MainScreen(),
         '/summary': (_) => const SummaryScreen(),
+        '/order': (_) => const OrderDetailsScreen(),
       },
     );
   }
