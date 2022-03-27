@@ -141,8 +141,8 @@ class SummaryScreen extends StatelessWidget with MainScreenComponent {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text('Kezdés: ' + Utils.formatDate(current.start)),
-              Text('Végzés: ' + Utils.formatDate(current.end)),
+              Text('Kezdet: ' + Utils.formatDate(current.start)),
+              Text('Végzet: ' + Utils.formatDate(current.end)),
             ],
           ),
         ),
