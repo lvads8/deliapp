@@ -20,7 +20,7 @@ mixin MainScreenComponent on Widget {
 }
 
 final List<MainScreenComponent> _subScreens = [
-  const OrdersScreen(),
+  OrdersScreen(),
   const SummaryScreen(),
 ];
 
