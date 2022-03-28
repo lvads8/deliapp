@@ -128,9 +128,9 @@ class Utils {
       );
 
       nav.popUntil((route) => !route.isFirst);
-      nav.pushReplacementNamed('/login');
+      nav.pushNamed('/login');
     } catch (e) {
-      log('Unknown error ocurred during login', error: e);
+      log('Unknown error ocurred', error: e);
 
       alertUser(context, 'Ismeretlen hiba történt: $e', snackBar: snackbar);
     }
