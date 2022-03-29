@@ -45,6 +45,7 @@ dependencies:
   fluttertoast: ^8.0.8
   intl: ^0.17.0
   flutter_phone_direct_caller: ^2.1.0
+  declarative_refresh_indicator: ^0.1.0
 
 dev_dependencies:
   flutter_test:
