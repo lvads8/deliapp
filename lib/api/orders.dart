@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:deliapp/api/checkin.dart';
+import 'package:deliapp/api/checkout.dart';
 import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/constants.dart';
+import 'package:deliapp/api/payment.dart';
 import 'package:http/http.dart';
 
 enum OrderType {
@@ -27,9 +30,10 @@ class RawOrder {
   final double longitude;
   final String clientPhone;
   final String clientName;
-  final String apartment;
-  final String streetName;
-  final String city;
+  final String address;
+  final String? apartment;
+  final String? streetName;
+  final String? city;
   final String? notes;
 
   const RawOrder(
@@ -45,6 +49,7 @@ class RawOrder {
     this.longitude,
     this.clientPhone,
     this.clientName,
+    this.address,
     this.apartment,
     this.streetName,
     this.city,
@@ -57,7 +62,9 @@ class RawOrder {
       json['shipmentDetailsId'],
       json['deliveryOrder'],
       DateTime.fromMillisecondsSinceEpoch(json['calculatedEndDt']),
-      DateTime.fromMillisecondsSinceEpoch(json['revisedEta']),
+      DateTime.fromMillisecondsSinceEpoch(
+        json['revisedEta'] ?? json['calculatedEndDt'],
+      ),
       json['orderType'] == 'PICKUP' ? OrderType.pickup : OrderType.deliver,
       json['paymentType'] == 'COD' ? PaymentType.cash : PaymentType.prepaid,
       (json['cashAmount'] as double).floor(),
@@ -65,21 +72,24 @@ class RawOrder {
       json['longitude'],
       json['clientNodePhone'],
       json['clientNodeName'],
+      json['address'],
       json['apartment'],
       json['streetName'],
       json['city'],
-      json.containsKey('shipmentNotes') ? json['shipmentNotes'] : null,
+      json['shipmentNotes'],
     );
   }
 }
 
 class RawOrderItem {
   final int detailsId;
+  final int count;
   final int cashAmount;
   final String name;
 
   const RawOrderItem(
     this.detailsId,
+    this.count,
     this.cashAmount,
     this.name,
   );
@@ -87,6 +97,7 @@ class RawOrderItem {
   factory RawOrderItem.fromJson(Map<String, dynamic> json) {
     return RawOrderItem(
       json['shipmentDetailsId'],
+      (json['noOfUnits'] as double).floor(),
       (json['crateAmount'] as double).floor(),
       json['crateCd'],
     );
@@ -95,8 +106,8 @@ class RawOrderItem {
 
 class Order {
   final bool pickedUp;
-  final int pickupLocationId;
-  final int deliverLocationId;
+  final int locationId;
+  final int shipmentId;
   final DateTime originalEta;
   final DateTime revisedEta;
   final PaymentType paymentType;
@@ -105,16 +116,17 @@ class Order {
   final double longitude;
   final String clientPhone;
   final String clientName;
-  final String apartment;
-  final String streetName;
-  final String city;
+  final String address;
+  final String? apartment;
+  final String? streetName;
+  final String? city;
   final String? notes;
   final List<OrderItem> items;
 
   const Order(
     this.pickedUp,
-    this.pickupLocationId,
-    this.deliverLocationId,
+    this.locationId,
+    this.shipmentId,
     this.originalEta,
     this.revisedEta,
     this.paymentType,
@@ -123,19 +135,64 @@ class Order {
     this.longitude,
     this.clientPhone,
     this.clientName,
+    this.address,
     this.apartment,
     this.streetName,
     this.city,
     this.notes,
     this.items,
   );
+
+  bool get hasShake => items.any((item) => item.isShake);
+
+  Future<void> checkin(Authentication auth) {
+    return Checkin.checkin(
+      CheckinRequest(
+        auth,
+        locationId,
+        latitude,
+        longitude,
+      ),
+    );
+  }
+
+  Future<void> collectCash(Authentication auth) {
+    if (paymentType != PaymentType.cash) {
+      throw "Can't collect cash for prepaid order";
+    }
+
+    return Payment.payment(
+      PaymentRequest(
+        auth,
+        cashAmount,
+        locationId,
+        latitude,
+        longitude,
+      ),
+    );
+  }
+
+  Future<void> checkout(Authentication auth) {
+    return Checkout.checkout(
+      CheckoutRequest(
+        auth,
+        shipmentId,
+        locationId,
+        latitude,
+        longitude,
+      ),
+    );
+  }
 }
 
 class OrderItem {
   final String name;
+  final int count;
   final int cashAmount;
 
-  const OrderItem(this.name, this.cashAmount);
+  const OrderItem(this.name, this.count, this.cashAmount);
+
+  bool get isShake => name.contains(RegExp('shake', caseSensitive: false));
 }
 
 class OrdersRequest {
@@ -167,6 +224,7 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
   @override
   OrdersResponse fromResponse(Response res) {
     final body = jsonDecode(utf8.decode(res.bodyBytes));
+
     if (res.statusCode == 401 || body['status'] == 401) {
       throw UnauthorizedException();
     }
@@ -182,8 +240,10 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
     final ordersSource = data['shipmentLocationDTOs'];
     final itemsSource = data['shipmentCrateMobileDTOs'];
 
-    final rawOrders = ordersSource.map((e) => RawOrder.fromJson(e));
-    final rawItems = itemsSource.map((e) => RawOrderItem.fromJson(e));
+    final rawOrders =
+        ordersSource.map<RawOrder>((e) => RawOrder.fromJson(e)).toList();
+    final rawItems =
+        itemsSource.map<RawOrderItem>((e) => RawOrderItem.fromJson(e)).toList();
 
     final orders = _sanitizeRawOrderData(rawOrders, rawItems);
 
@@ -204,7 +264,7 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
         .map(
           (p) => [
             p,
-            rawOrders.firstWhere((d) => p.detailsId == d.detailsId),
+            rawOrders.lastWhere((d) => p.detailsId == d.detailsId),
           ],
         )
         .toList();
@@ -217,15 +277,16 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
         Order(
           false,
           pickup.locationId,
-          deliver.locationId,
+          pickup.detailsId,
           pickup.originalEta,
           pickup.revisedEta,
           deliver.paymentType,
           deliver.cashAmount,
-          deliver.latitude,
-          deliver.longitude,
+          pickup.latitude,
+          pickup.longitude,
           deliver.clientPhone,
           _sanitizeClientName(deliver.clientName),
+          _sanitizeAddress(deliver.address),
           deliver.apartment,
           deliver.streetName,
           deliver.city,
@@ -242,8 +303,8 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
       orders.add(
         Order(
           true,
-          0,
           remains.locationId,
+          remains.detailsId,
           remains.originalEta,
           remains.revisedEta,
           remains.paymentType,
@@ -252,6 +313,7 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
           remains.longitude,
           remains.clientPhone,
           _sanitizeClientName(remains.clientName),
+          _sanitizeAddress(remains.address),
           remains.apartment,
           remains.streetName,
           remains.city,
@@ -268,9 +330,13 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
     List<RawOrderItem> rawItems,
     int id,
   ) {
+    String fixName(String name) {
+      return name.replaceAll(RegExp('^\\d+\\. '), '');
+    }
+
     return rawItems
         .where((e) => e.detailsId == id)
-        .map((e) => OrderItem(e.name, e.cashAmount))
+        .map((e) => OrderItem(fixName(e.name), e.count, e.cashAmount))
         .toList();
   }
 
@@ -284,4 +350,38 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
 
     return clientName.split(':')[1];
   }
+
+  static String _sanitizeAddress(String address) {
+    final countryAndZipCode = RegExp(',\\w+,\\d{4}\$');
+    final uglyCommas = RegExp('(.),(.)');
+    return address
+        .replaceAll(countryAndZipCode, '')
+        .replaceAllMapped(
+          uglyCommas,
+          (match) => '${match.group(1)}, ${match.group(2)}',
+        )
+        .split(', ')
+        .map((s) => s.toTitleCase())
+        .join(', ');
+  }
+}
+
+extension StringCasingExtension on String {
+  String toCapitalized() {
+    if (length == 0) {
+      return '';
+    }
+
+    final lower = toLowerCase().trim();
+    if (['u.', 'u', 'utca', 'ut', 'út', 'krt.', 'krt'].contains(lower)) {
+      return lower;
+    }
+
+    return '${this[0].toUpperCase()}${substring(1).toLowerCase()}';
+  }
+
+  String toTitleCase() => replaceAll(RegExp(' +'), ' ')
+      .split(' ')
+      .map((str) => str.toCapitalized())
+      .join(' ');
 }
