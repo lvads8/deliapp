@@ -55,7 +55,7 @@ class OrdersScreen extends StatelessWidget with MainScreenComponent {
                       context,
                       () async {
                         await pickup.checkin(auth);
-                        await pickup.checkout(auth);
+                        await pickup.pickedup(auth);
                       },
                       null,
                     ),
