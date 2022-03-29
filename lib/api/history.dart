@@ -84,7 +84,7 @@ class History extends ResponseObjectFactory<HistoryResponse> {
     if (!body.containsKey('data')) return const HistoryResponse(0, []);
 
     final data = body['data'][0];
-    final cash = (data['totalAmountCollected'] as double).floor();
+    final cash = (data['totalAmountCollected'] as double?)?.floor() ?? 0;
     final trips = (data['deliveryMediumTripHistoryDTOs'] as List<dynamic>)
         .map(
           (e) => HistoryTrip(
