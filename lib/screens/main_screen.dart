@@ -4,6 +4,7 @@ import 'package:deliapp/cubits/auth_cubit.dart';
 import 'package:deliapp/cubits/break_cubit.dart';
 import 'package:deliapp/cubits/history_cubit.dart';
 import 'package:deliapp/cubits/orders_cubit.dart';
+import 'package:deliapp/cubits/refreshing_cubit.dart';
 import 'package:deliapp/cubits/selected_index_cubit.dart';
 import 'package:deliapp/cubits/timespan_cubit.dart';
 import 'package:deliapp/screens/orders_screen.dart';
@@ -46,7 +47,10 @@ class _MainScreenState extends State<MainScreen> with ScreenLoader {
               create: (_) => HistoryCubit(),
               child: BlocProvider(
                 create: (_) => OrdersCubit(),
-                child: MainScreenView(_logout),
+                child: BlocProvider(
+                  create: (_) => RefreshingCubit(),
+                  child: MainScreenView(_logout),
+                ),
               ),
             ),
           ),
