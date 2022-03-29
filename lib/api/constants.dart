@@ -20,3 +20,5 @@ const String paymentUrl =
     baseUrl + 'ShipmentApp/mobile/shipment/payment/v2?path_param_url=1729';
 const String ordersUrl = baseUrl +
     'ShipmentApp/mobile/shipment/list?version=466&paramkey=com.loginext.tracknext';
+const String pickedUpUrl =
+    baseUrl + 'ShipmentApp/mobile/shipment/mile/pickedup?path_param_url=1729';
