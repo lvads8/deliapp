@@ -5,6 +5,7 @@ import 'package:deliapp/api/checkout.dart';
 import 'package:deliapp/api/common.dart';
 import 'package:deliapp/api/constants.dart';
 import 'package:deliapp/api/payment.dart';
+import 'package:deliapp/api/pickedup.dart';
 import 'package:http/http.dart';
 
 enum OrderType {
@@ -61,10 +62,8 @@ class RawOrder {
       json['shipmentLocationId'],
       json['shipmentDetailsId'],
       json['deliveryOrder'],
+      DateTime.fromMillisecondsSinceEpoch(json['endTimeWindow']),
       DateTime.fromMillisecondsSinceEpoch(json['calculatedEndDt']),
-      DateTime.fromMillisecondsSinceEpoch(
-        json['revisedEta'] ?? json['calculatedEndDt'],
-      ),
       json['orderType'] == 'PICKUP' ? OrderType.pickup : OrderType.deliver,
       json['paymentType'] == 'COD' ? PaymentType.cash : PaymentType.prepaid,
       (json['cashAmount'] as double).floor(),
@@ -145,6 +144,18 @@ class Order {
 
   bool get hasShake => items.any((item) => item.isShake);
 
+  Future<void> pickedup(Authentication auth) {
+    return Pickedup.pickedUp(
+      PickedupRequest(
+        auth,
+        shipmentId,
+        locationId,
+        latitude,
+        longitude,
+      ),
+    );
+  }
+
   Future<void> checkin(Authentication auth) {
     return Checkin.checkin(
       CheckinRequest(
@@ -180,6 +191,7 @@ class Order {
         locationId,
         latitude,
         longitude,
+        'DELIVERED',
       ),
     );
   }
@@ -282,8 +294,8 @@ class Orders extends ResponseObjectFactory<OrdersResponse> {
           pickup.revisedEta,
           deliver.paymentType,
           deliver.cashAmount,
-          pickup.latitude,
-          pickup.longitude,
+          deliver.latitude,
+          deliver.longitude,
           deliver.clientPhone,
           _sanitizeClientName(deliver.clientName),
           _sanitizeAddress(deliver.address),

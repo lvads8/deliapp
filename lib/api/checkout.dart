@@ -10,6 +10,7 @@ class CheckoutRequest {
   final int locationId;
   final double latitude;
   final double longitude;
+  final String status;
 
   const CheckoutRequest(
     this.auth,
@@ -17,6 +18,7 @@ class CheckoutRequest {
     this.locationId,
     this.latitude,
     this.longitude,
+    this.status,
   );
 }
 
@@ -31,6 +33,7 @@ class Checkout extends ResponseObjectFactory<void> {
       'checkOutTime': DateTime.now().toIso8601String(),
       'checkOutLatitude': request.latitude,
       'checkOutLongitude': request.longitude,
+      'status': request.status,
       'path_param_url': '1729',
       'transactionId': '',
     });
