@@ -1,7 +1,4 @@
-import 'package:deliapp/api/checkin.dart';
-import 'package:deliapp/api/checkout.dart';
 import 'package:deliapp/api/orders.dart';
-import 'package:deliapp/api/payment.dart';
 import 'package:deliapp/cubits/auth_cubit.dart';
 import 'package:deliapp/utils.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +37,8 @@ class OrderDetailsScreen extends StatelessWidget {
               Text('Megjegyzés: ' + (order.notes ?? '<nincs megjegyzés>')),
               Text('Fizetés: ${order.paymentType.name}'),
               Text('Lóvé della: ${order.cashAmount}'),
+              Text('Eredeti ETA ${order.originalEta}'),
+              Text('Revised ETA ${order.revisedEta}'),
               ElevatedButton(
                 onPressed: () async {
                   if (!await Utils.promptUser(
@@ -52,34 +51,11 @@ class OrderDetailsScreen extends StatelessWidget {
                       context,
                       () async {
                         final auth = context.read<AuthCubit>().state!.auth;
-                        await Checkin.checkin(
-                          CheckinRequest(
-                            auth,
-                            order.locationId,
-                            order.latitude,
-                            order.longitude,
-                          ),
-                        );
+                        await order.checkin(auth);
                         if (order.paymentType == PaymentType.cash) {
-                          await Payment.payment(
-                            PaymentRequest(
-                              auth,
-                              order.cashAmount,
-                              order.locationId,
-                              order.latitude,
-                              order.longitude,
-                            ),
-                          );
+                          await order.collectCash(auth);
                         }
-                        await Checkout.checkout(
-                          CheckoutRequest(
-                            auth,
-                            order.shipmentId,
-                            order.locationId,
-                            order.latitude,
-                            order.longitude,
-                          ),
-                        );
+                        await order.checkout(auth);
                       },
                       null,
                     );
@@ -88,23 +64,8 @@ class OrderDetailsScreen extends StatelessWidget {
                       context,
                       () async {
                         final auth = context.read<AuthCubit>().state!.auth;
-                        await Checkin.checkin(
-                          CheckinRequest(
-                            auth,
-                            order.locationId,
-                            order.latitude,
-                            order.longitude,
-                          ),
-                        );
-                        await Checkout.checkout(
-                          CheckoutRequest(
-                            auth,
-                            order.shipmentId,
-                            order.locationId,
-                            order.latitude,
-                            order.longitude,
-                          ),
-                        );
+                        await order.checkin(auth);
+                        await order.pickedup(auth);
                       },
                       null,
                     );
