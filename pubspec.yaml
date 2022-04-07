@@ -42,6 +42,7 @@ dependencies:
   intl: ^0.17.0
   flutter_phone_direct_caller: ^2.1.0
   declarative_refresh_indicator: ^0.1.0
+  device_info_plus: ^3.2.2
 
 dev_dependencies:
   flutter_test:

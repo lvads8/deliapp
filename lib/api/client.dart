@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
-import 'api_auth.dart';
+import 'models/api_auth.dart';
 
 const String _baseUrl = 'https://products.loginextsolutions.com/';
 const String _appVersion = '5.0.99';
@@ -53,6 +53,11 @@ class ApiResponse {
   late final String bodyText = utf8.decode(bodyBytes);
   late final dynamic bodyJson = jsonDecode(bodyText);
 
+  bool get isSuccess => _checkStatus(200);
+  bool get isUnauthorized => _checkStatus(401);
+  String get message => bodyJson['message'];
+  String get error => bodyJson['error'] ?? message;
+
   ApiResponse._(
     this.statusCode,
     this.headers,
@@ -66,7 +71,13 @@ class ApiResponse {
       response.bodyBytes,
     );
   }
+
+  bool _checkStatus(int status) {
+    return statusCode == status || bodyJson['status'] == status;
+  }
 }
+
+class UnauthorizedError extends Error {}
 
 class ApiClient {
   static final String _platform = Platform.isIOS ? 'iOS' : 'Android';
@@ -119,8 +130,7 @@ class ApiClient {
       'User-Agent': _userAgent,
       'x-app-version': _appVersion,
       'x-platform': _platform,
-    };
-    headers.addAll(request.apiAuth?.toHeader() ?? {});
+    }..addAll(request.apiAuth?.toHeader() ?? {});
 
     return headers;
   }
