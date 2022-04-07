@@ -75,6 +75,11 @@ class ApiResponse {
   bool _checkStatus(int status) {
     return statusCode == status || bodyJson['status'] == status;
   }
+
+  void throwOnError() {
+    if (isUnauthorized) throw UnauthorizedError();
+    if (!isSuccess) throw error;
+  }
 }
 
 class UnauthorizedError extends Error {}

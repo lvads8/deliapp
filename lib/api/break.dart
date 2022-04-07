@@ -15,7 +15,6 @@ abstract class Break {
     final client = ApiClient();
     final response = await client.put(request);
 
-    if (response.isUnauthorized) throw UnauthorizedError();
-    if (!response.isSuccess) throw response.error;
+    response.throwOnError();
   }
 }

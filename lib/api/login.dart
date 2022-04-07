@@ -21,13 +21,11 @@ abstract class Login {
     );
 
     final client = ApiClient();
-    final response = await client.post(request);
-    if (response.isUnauthorized) return null;
-    if (!response.isSuccess) throw response.error;
+    final response = await client.post(request)
+      ..throwOnError();
 
     final data = response.bodyJson['data'];
     final auth = ApiAuth.fromHeaders(response.headers);
-
     return LoginInfo(
       auth,
       data['userName']!,
