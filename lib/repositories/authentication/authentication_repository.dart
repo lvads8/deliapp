@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:deliapp/api/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
 
@@ -15,6 +16,15 @@ class AuthenticationRepository {
   }
 
   LoginInfo? get loginInfo => _loginInfo;
+
+  Future loadInitialState() async {
+    final stored = await _tryReadFromSharedPrefs();
+    if (stored == null) return;
+
+    // TODO: Verify login
+    _loginInfo = stored;
+    _controller.add(AuthenticationStatus.authenticated);
+  }
 
   Future<bool> login({
     required String username,
@@ -34,13 +44,23 @@ class AuthenticationRepository {
     return false;
   }
 
-  Future<void> logout() async {
+  Future logout() async {
     if (_loginInfo != null) return;
 
-    Logout.logout(_loginInfo!.auth).ignore();
-    _loginInfo = null;
+    await Logout.logout(_loginInfo!.auth);
     _controller.add(AuthenticationStatus.unauthenticated);
+
+    final instance = await SharedPreferences.getInstance();
+    _loginInfo!.clearSharedPreferences(instance).ignore();
+    _loginInfo = null;
   }
 
   void dispose() => _controller.close();
+
+  Future<LoginInfo?> _tryReadFromSharedPrefs() async {
+    final instance = await SharedPreferences.getInstance();
+    if (!instance.containsKey('www-authenticate')) return null;
+
+    return LoginInfo.fromSharedPreferences(instance);
+  }
 }
