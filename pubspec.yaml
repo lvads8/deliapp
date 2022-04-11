@@ -44,6 +44,7 @@ dependencies:
   declarative_refresh_indicator: ^0.1.0
   device_info_plus: ^3.2.2
   equatable: ^2.0.3
+  logging: ^1.0.2
 
 dev_dependencies:
   flutter_test:
