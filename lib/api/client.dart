@@ -5,10 +5,10 @@ import 'package:http/http.dart';
 
 import 'models/api_auth.dart';
 
-const String _baseUrl = 'https://products.loginextsolutions.com/';
-const String _appVersion = '5.0.99';
-const String _userAgent = 'KFCDeliapp';
-const String _contentType = 'application/json; charset=utf-8';
+const _baseUrl = 'https://products.loginextsolutions.com/';
+const _appVersion = '5.0.99';
+const _userAgent = 'KFCDeliapp';
+const _contentType = 'application/json; charset=utf-8';
 
 class UrlQueryParameter {
   final String key;
@@ -53,8 +53,8 @@ class ApiResponse {
   late final String bodyText = utf8.decode(bodyBytes);
   late final dynamic bodyJson = jsonDecode(bodyText);
 
-  bool get isSuccess => _checkStatus(200);
-  bool get isUnauthorized => _checkStatus(401);
+  bool get isSuccess => _isStatus(200);
+  bool get isUnauthorized => _isStatus(401);
   String get message => bodyJson['message'];
   String get error => bodyJson['error'] ?? message;
 
@@ -72,7 +72,7 @@ class ApiResponse {
     );
   }
 
-  bool _checkStatus(int status) {
+  bool _isStatus(int status) {
     return statusCode == status || bodyJson['status'] == status;
   }
 
@@ -85,9 +85,9 @@ class ApiResponse {
 class UnauthorizedError extends Error {}
 
 class ApiClient {
-  static final String _platform = Platform.isIOS ? 'iOS' : 'Android';
+  static final _platform = Platform.isIOS ? 'iOS' : 'Android';
 
-  final Client _client = Client();
+  final _client = Client();
 
   Future<ApiResponse> get(ApiRequest request) async {
     final uri = request.craftUri();
