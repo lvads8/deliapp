@@ -1,8 +1,8 @@
-import 'package:deliapp/app.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 import 'repositories/repositories.dart';
+import 'app.dart';
 
 void main() {
   EquatableConfig.stringify = true;
@@ -10,7 +10,9 @@ void main() {
   final authRepo = AuthenticationRepository();
   authRepo.loadInitialState().ignore();
 
-  runApp(App(
-    authRepo: authRepo,
-  ));
+  runApp(
+    App(
+      authRepo: authRepo,
+    ),
+  );
 }
