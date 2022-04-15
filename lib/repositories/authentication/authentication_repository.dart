@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:deliapp/api/api.dart';
+import 'package:deliapp/api/client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 enum AuthenticationStatus { unknown, authenticated, unauthenticated }
@@ -19,9 +20,10 @@ class AuthenticationRepository {
 
   Future loadInitialState() async {
     final stored = await _tryReadFromSharedPrefs();
-    if (stored == null) return;
 
-    // TODO: Verify login
+    if (stored != null) {
+      // TODO: Verify login
+    }
     _loginInfo = stored;
     _controller.add(AuthenticationStatus.authenticated);
   }
@@ -29,23 +31,29 @@ class AuthenticationRepository {
   Future<bool> login({
     required String username,
     required String password,
+    bool rememberMe = false,
   }) async {
-    final response = await Login.login(
-      username: username,
-      password: password,
-    );
+    try {
+      final response = await Login.login(
+        username: username,
+        password: password,
+      );
 
-    if (response != null) {
+      if (response == null) {
+        return false;
+      }
+
       _loginInfo = response;
       _controller.add(AuthenticationStatus.authenticated);
+      _writeToSharedPrefs().ignore();
       return true;
+    } on UnauthorizedError {
+      return false;
     }
-
-    return false;
   }
 
   Future logout() async {
-    if (_loginInfo != null) return;
+    if (_loginInfo == null) return;
 
     await Logout.logout(_loginInfo!.auth);
     _controller.add(AuthenticationStatus.unauthenticated);
@@ -62,5 +70,11 @@ class AuthenticationRepository {
     if (!instance.containsKey('www-authenticate')) return null;
 
     return LoginInfo.fromSharedPreferences(instance);
+  }
+
+  Future _writeToSharedPrefs() async {
+    final instance = await SharedPreferences.getInstance();
+
+    return _loginInfo?.toSharedPreferences(instance);
   }
 }
