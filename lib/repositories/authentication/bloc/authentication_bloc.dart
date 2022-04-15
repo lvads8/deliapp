@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
-import '../../../api/models/api_auth.dart';
+import '../../../api/models/models.dart';
 import '../authentication_repository.dart';
 
 part 'authentication_event.dart';
@@ -44,7 +44,7 @@ class AuthenticationBloc
       case AuthenticationStatus.authenticated:
         final loginInfo = _authenticationRepository.loginInfo;
         if (loginInfo != null) {
-          return emit(AuthenticationState.authenticated(loginInfo.auth));
+          return emit(AuthenticationState.authenticated(loginInfo));
         } else {
           return emit(const AuthenticationState.unauthenticated());
         }
