@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
@@ -32,7 +33,7 @@ class ApiRequest {
     this.endpoint, {
     this.apiAuth,
     this.queryParameters = const [],
-    this.body = '',
+    this.body = '{}',
   });
 
   Uri craftUri() {
@@ -98,6 +99,7 @@ class ApiClient {
       headers: headers,
     );
 
+    log('GET $uri\nheaders: $headers\n=>\n$response');
     return ApiResponse._fromResponse(response);
   }
 
@@ -112,6 +114,7 @@ class ApiClient {
       encoding: utf8,
     );
 
+    log('POST $uri\nheaders: $headers\nbody: ${request.body}\n=>\ncode: ${response.statusCode}\nheaders: ${response.headers}\nbody: ${utf8.decode(response.bodyBytes)}');
     return ApiResponse._fromResponse(response);
   }
 
