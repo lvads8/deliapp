@@ -1,11 +1,19 @@
+import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api_auth.dart';
 
-class LoginInfo {
+class LoginInfo extends Equatable {
   static const _usernameKey = 'username';
   static const _fullNameKey = 'fullName';
   static const _isOnBreakKey = 'isOnBreak';
+
+  static const empty = LoginInfo(
+    ApiAuth.empty,
+    '-',
+    '-',
+    true,
+  );
 
   final ApiAuth auth;
   final String username;
@@ -27,6 +35,9 @@ class LoginInfo {
       instance.getBool(_isOnBreakKey)!,
     );
   }
+
+  @override
+  List<Object?> get props => [auth, username, fullName, isOnBreak];
 
   Future toSharedPreferences(SharedPreferences instance) async {
     await auth.toSharedPreferences(instance);

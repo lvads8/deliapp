@@ -1,8 +1,14 @@
+import 'package:equatable/equatable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ApiAuth {
+class ApiAuth extends Equatable {
   static const _authKey = 'www-authenticate';
   static const _secretKey = 'client_secret_key';
+
+  static const empty = ApiAuth._(
+    '-',
+    '-',
+  );
 
   final String authorization;
   final String secret;
@@ -22,6 +28,9 @@ class ApiAuth {
       instance.getString(_secretKey)!,
     );
   }
+
+  @override
+  List<Object> get props => [authorization, secret];
 
   Map<String, String> toHeader() {
     return {
